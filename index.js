@@ -13,13 +13,12 @@ const handleMessages = (messages, msg) => {
   let lastMessage
   a = messages.first(100).map(m => {
     let embed, embedTitle, embedType, embedUrl, imageUrl
-    counter = m.id
+    messageId = m.id
     if(m.embeds.length){
       embed = m.embeds[0]
       embedTitle = embed.title
       embedType = embed.type
       embedUrl = embed.url
-      imageUrl = embed.thumbnail.url
     }
     const attachement = m.attachments.length ? m.attachments[0] : null
     let obj = {
@@ -29,15 +28,11 @@ const handleMessages = (messages, msg) => {
       channelId: m.channel.id,
       attachement,
       embed,
-      counter
+      messageId
     }
     lastMessage = obj
-    // console.log(obj)
     if(embedUrl && m.author.id === mention.id){
-      // const attachment = new MessageAttachment(imageUrl);
-      // Send the attachment in the message channel
-      msg.channel.send(`${m.author.username} : ${moment(m.createdAt).fromNow()} ${embedTitle}  <${embedUrl}>`)
-      console.log(obj)
+      msg.channel.send(`${moment(m.createdAt).fromNow()} ${embedTitle}  <${embedUrl}>`)
     }
   })
   return lastMessage
@@ -53,9 +48,9 @@ client.on('message', msg => {
   const authorId = msg.author.id
   const authorName = msg.author.username
   const message = msg.content
-  if(channelName !== 'makoto' ){
-    return
-  }
+  // if(channelName !== 'makoto' ){
+  //   return
+  // }
   let matched = message.match(/^\/activity (.*)/)
   if(!matched){
     return
@@ -63,17 +58,26 @@ client.on('message', msg => {
   console.log({chennelId, channelName, authorId, authorName, matched})
 
   msg.channel.guild.members.fetch()
+  let counter = 1
+  function fetchMessage(msg, messageId){
+    console.log({counter, messageId})
+    msg.channel.messages.fetch({limit:100, before:messageId})
+    .then(messages => {
+        console.log(`${msg.channel.name} Received ${messages.size} messages`)
+        const lastMessage = handleMessages(messages, msg)
+        if(lastMessage && lastMessage.messageId != messageId){
+          counter = counter + 1;
+          fetchMessage(msg, lastMessage.messageId)
+        }else{
+          console.log('no more messages', {lastMessage})
+        }
+    })
+  }
   msg.channel.messages.fetch({limit:100})
     .then(messages => {
         console.log(`${msg.channel.name} Received ${messages.size} messages`)
         const lastMessage = handleMessages(messages, msg)
-        console.log({lastMessage})
-        msg.channel.messages.fetch({limit:100, before:lastMessage.counter})
-          .then(messages => {
-              console.log(`${msg.channel.name} Received ${messages.size} messages`)
-              const lastMessage = handleMessages(messages, msg)
-              console.log({lastMessage})
-          })
+        fetchMessage(msg, lastMessage.messageId)
     })
     .catch(console.error);
 });
