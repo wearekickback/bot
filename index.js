@@ -20,7 +20,7 @@ const handleMessages = (messages, msg) => {
       embedType = embed.type
       embedUrl = embed.url
     }
-    const attachement = m.attachments.length ? m.attachments[0] : null
+    // const attachement = m.attachments.length ? m.attachments[0] : null
     let obj = {
       content:m.content, createdTimestamp:m.createdTimestamp, createdAt:m.createdAt,
       messages: m.message,
@@ -40,6 +40,7 @@ const handleMessages = (messages, msg) => {
 
 
 client.on('message', msg => { 
+  console.log({msg})
   if(msg.author.bot){
       return;
   }
@@ -57,7 +58,6 @@ client.on('message', msg => {
   }
   console.log({chennelId, channelName, authorId, authorName, matched})
 
-  msg.channel.guild.members.fetch()
   let counter = 1
   function fetchMessage(msg, messageId){
     console.log({counter, messageId})
