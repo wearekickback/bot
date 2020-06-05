@@ -18,7 +18,7 @@ node index.js
 
 ## Command Reference
 
-### Minimum
+### Minimum
 
 - `$submit URL`   /
 - `$submit ATTACHEMENT`
