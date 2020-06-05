@@ -1,4 +1,17 @@
-# TODO
+# Bot
+
+## How to setup
+
+```
+git clone https://github.com/wearekickback/bot.git
+cd bot
+nvm use
+export DISCORD_TOKEN=$TOKEN
+yarn
+node index.js
+```
+
+## TODO
 
 - Reorganise the codebase to use [command style](https://discordjs.guide/command-handling/#individual-command-files)
 - Create daily summary
